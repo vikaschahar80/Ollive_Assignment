@@ -36,12 +36,20 @@ function Sidebar({
           </div>
         ) : (
           conversations.map((convo) => (
-            <button
+            <div
               key={convo.id}
               className={`convo-item ${activeConvoId === convo.id ? 'active' : ''}`}
+              role="button"
+              tabIndex={0}
               onClick={() => {
                 setActiveConvoId(convo.id);
                 setActiveView('chat');
+              }}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  setActiveConvoId(convo.id);
+                  setActiveView('chat');
+                }
               }}
             >
               <MessageSquare size={16} style={{ flexShrink: 0 }} />
@@ -58,7 +66,7 @@ function Sidebar({
               >
                 <Trash2 size={13} />
               </button>
-            </button>
+            </div>
           ))
         )}
       </div>
