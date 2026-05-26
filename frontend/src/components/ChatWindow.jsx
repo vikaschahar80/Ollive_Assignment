@@ -100,8 +100,14 @@ function ChatWindow({
                 break;
               }
 
+              let parsed = null;
               try {
-                const parsed = JSON.parse(dataText);
+                parsed = JSON.parse(dataText);
+              } catch (parseErr) {
+                // Ignore malformed/empty SSE lines gracefully
+              }
+
+              if (parsed) {
                 if (parsed.text) {
                   assistantResponse += parsed.text;
                   // Update current message stream UI
@@ -118,8 +124,6 @@ function ChatWindow({
                 } else if (parsed.error) {
                   throw new Error(parsed.error);
                 }
-              } catch (parseErr) {
-                // Ignore parsing errors for empty lines
               }
             }
           }
