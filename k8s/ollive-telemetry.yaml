@@ -1,0 +1,223 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: ollive-telemetry
+---
+# 1. Database Storage PVC
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: postgres-pvc
+  namespace: ollive-telemetry
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+---
+# 2. Database Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: db
+  namespace: ollive-telemetry
+spec:
+  ports:
+    - port: 5432
+  selector:
+    app: db
+---
+# 3. Database Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: db
+  namespace: ollive-telemetry
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: db
+  template:
+    metadata:
+      labels:
+        app: db
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:16-alpine
+          env:
+            - name: POSTGRES_DB
+              value: ollive_logging
+            - name: POSTGRES_USER
+              value: postgres
+            - name: POSTGRES_PASSWORD
+              value: postgres
+          ports:
+            - containerPort: 5432
+          volumeMounts:
+            - name: postgres-storage
+              mountPath: /var/lib/postgresql/data
+      volumes:
+        - name: postgres-storage
+          persistentVolumeClaim:
+            claimName: postgres-pvc
+---
+# 4. Redis Queue Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis
+  namespace: ollive-telemetry
+spec:
+  ports:
+    - port: 6379
+  selector:
+    app: redis
+---
+# 5. Redis Queue Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis
+  namespace: ollive-telemetry
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redis
+  template:
+    metadata:
+      labels:
+        app: redis
+    spec:
+      containers:
+        - name: redis
+          image: redis:7-alpine
+          ports:
+            - containerPort: 6379
+---
+# 6. Backend API Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend
+  namespace: ollive-telemetry
+spec:
+  ports:
+    - port: 5001
+  selector:
+    app: backend
+---
+# 7. Backend API Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+  namespace: ollive-telemetry
+spec:
+  replicas: 2 # Double replica size for high availability ingestion scaling
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+        - name: backend
+          image: vikaschahar80/ollive-backend:latest # Placeholder image path
+          env:
+            - name: PORT
+              value: "5001"
+            - name: NODE_ENV
+              value: "production"
+            - name: DATABASE_URL
+              value: "postgresql://postgres:postgres@db:5432/ollive_logging"
+            - name: REDIS_HOST
+              value: "redis"
+            - name: REDIS_PORT
+              value: "6379"
+            - name: INGESTION_ENDPOINT
+              value: "http://backend:5001/api/ingest"
+            # Optional model API keys can be passed as Secrets
+            - name: OPENAI_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: llm-api-keys
+                  key: openai-key
+                  optional: true
+            - name: GEMINI_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: llm-api-keys
+                  key: gemini-key
+                  optional: true
+          ports:
+            - containerPort: 5001
+---
+# 8. Frontend Nginx Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend
+  namespace: ollive-telemetry
+spec:
+  ports:
+    - port: 3000
+  selector:
+    app: frontend
+  type: ClusterIP
+---
+# 9. Frontend Nginx Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+  namespace: ollive-telemetry
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: frontend
+  template:
+    metadata:
+      labels:
+        app: frontend
+    spec:
+      containers:
+        - name: frontend
+          image: vikaschahar80/ollive-frontend:latest # Placeholder image path
+          ports:
+            - containerPort: 3000
+---
+# 10. Ingress Gateway Configuration
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: telemetry-gateway
+  namespace: ollive-telemetry
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: ollive-telemetry.local
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: frontend
+                port:
+                  number: 3000
+          - path: /api
+            pathType: Prefix
+            backend:
+              service:
+                name: backend
+                port:
+                  number: 5001
