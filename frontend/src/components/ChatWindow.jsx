@@ -202,6 +202,7 @@ function ChatWindow({
             <>
               <option value="gemini-1.5-flash">Model: Gemini-1.5-flash</option>
               <option value="gemini-1.5-pro">Model: Gemini-1.5-pro</option>
+              <option value="gemini-pro">Model: Gemini-pro (Legacy)</option>
             </>
           )}
         </select>
