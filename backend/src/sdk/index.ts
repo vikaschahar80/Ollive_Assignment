@@ -7,15 +7,22 @@ import { redactPII } from './redactor';
 const openAIKey = process.env.OPENAI_API_KEY || '';
 const geminiKey = process.env.GEMINI_API_KEY || '';
 
-const openai = openAIKey ? new OpenAI({ apiKey: openAIKey }) : null;
+const openai = openAIKey ? new OpenAI({ 
+  apiKey: openAIKey,
+  ...(openAIKey.startsWith('sk-or-') ? { baseURL: 'https://openrouter.ai/api/v1' } : {})
+}) : null;
 const genAI = geminiKey ? new GoogleGenerativeAI(geminiKey) : null;
 
 // Standard static pricing lookup (USD per token)
 const PRICING: Record<string, { input: number; output: number }> = {
   'gpt-4o-mini': { input: 0.00000015, output: 0.00000060 },
   'gpt-4o': { input: 0.0000025, output: 0.000010 },
+  'gpt-3.5-turbo': { input: 0.00000050, output: 0.00000150 },
+  'meta-llama/llama-3-8b-instruct:free': { input: 0, output: 0 },
   'gemini-1.5-flash': { input: 0.000000075, output: 0.00000030 },
+  'gemini-2.0-flash': { input: 0.000000075, output: 0.00000030 },
   'gemini-1.5-pro': { input: 0.00000125, output: 0.0000050 },
+  'gemini-2.5-pro': { input: 0.00000125, output: 0.0000050 },
   'gemini-pro': { input: 0.00000050, output: 0.00000150 },
   'mock-model': { input: 0, output: 0 }
 };

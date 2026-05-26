@@ -31,7 +31,7 @@ function ChatWindow({
     const nextProvider = e.target.value;
     setProvider(nextProvider);
     if (nextProvider === 'openai') {
-      setModel('gpt-4o-mini');
+      setModel('gpt-3.5-turbo');
     } else if (nextProvider === 'gemini') {
       setModel('gemini-1.5-flash');
     } else {
@@ -194,14 +194,17 @@ function ChatWindow({
           {provider === 'mock' && <option value="mock-model">Model: Simulated Tracer LLM</option>}
           {provider === 'openai' && (
             <>
+              <option value="gpt-3.5-turbo">Model: GPT-3.5-turbo (Free Tier)</option>
               <option value="gpt-4o-mini">Model: GPT-4o-mini (Lightweight)</option>
               <option value="gpt-4o">Model: GPT-4o (High-perf)</option>
+              <option value="meta-llama/llama-3-8b-instruct:free">Model: LLaMA-3-8b (OpenRouter Free)</option>
             </>
           )}
           {provider === 'gemini' && (
             <>
-              <option value="gemini-1.5-flash">Model: Gemini-1.5-flash</option>
-              <option value="gemini-1.5-pro">Model: Gemini-1.5-pro</option>
+              <option value="gemini-1.5-flash">Model: Gemini-1.5-flash (Free - 15 RPM)</option>
+              <option value="gemini-2.0-flash">Model: Gemini-2.0-flash (Free - 10 RPM)</option>
+              <option value="gemini-2.5-pro">Model: Gemini-2.5-pro (Free - 2 RPM)</option>
               <option value="gemini-pro">Model: Gemini-pro (Legacy)</option>
             </>
           )}
