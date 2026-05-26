@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Send, Ban, MessageSquare, ShieldCheck, Eye, EyeOff } from 'lucide-react';
+import { API_BASE } from '../config';
 
 function ChatWindow({
   activeConvoId,
@@ -63,7 +64,7 @@ function ChatWindow({
     abortControllerRef.current = controller;
 
     try {
-      const response = await fetch(`/api/conversations/${activeConvoId}/chat`, {
+      const response = await fetch(`${API_BASE}/conversations/${activeConvoId}/chat`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

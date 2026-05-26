@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Sidebar from './components/Sidebar';
 import ChatWindow from './components/ChatWindow';
 import Dashboard from './components/Dashboard';
+import { API_BASE } from './config';
 
 function App() {
   const [activeView, setActiveView] = useState('chat'); // 'chat' | 'dashboard'
@@ -14,9 +15,6 @@ function App() {
   // Selected completion settings
   const [provider, setProvider] = useState('mock');
   const [model, setModel] = useState('mock-model');
-
-  // Backend URL helper (defaults to proxy relative path)
-  const API_BASE = '/api';
 
   // 1. Fetch conversations list
   const fetchConversations = async () => {

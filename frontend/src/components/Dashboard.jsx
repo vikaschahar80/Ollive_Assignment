@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Activity, Clock, Zap, AlertTriangle, DollarSign, Database, ShieldAlert, RefreshCw } from 'lucide-react';
+import { API_BASE } from '../config';
 
 function Dashboard({ showToast }) {
   const [analyticsData, setAnalyticsData] = useState(null);
@@ -8,7 +9,7 @@ function Dashboard({ showToast }) {
   // Fetch telemetry logs and statistics
   const fetchAnalytics = async () => {
     try {
-      const res = await fetch('/api/analytics');
+      const res = await fetch(`${API_BASE}/analytics`);
       if (res.ok) {
         const data = await res.json();
         setAnalyticsData(data);
