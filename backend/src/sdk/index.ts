@@ -21,6 +21,7 @@ const PRICING: Record<string, { input: number; output: number }> = {
   'meta-llama/llama-3-8b-instruct:free': { input: 0, output: 0 },
   'gemini-1.5-flash': { input: 0.000000075, output: 0.00000030 },
   'gemini-2.0-flash': { input: 0.000000075, output: 0.00000030 },
+  'gemini-3.1-flash-lite': { input: 0.00000003, output: 0.00000010 }, // Lite flash tier pricing parameters
   'gemini-1.5-pro': { input: 0.00000125, output: 0.0000050 },
   'gemini-2.5-pro': { input: 0.00000125, output: 0.0000050 },
   'gemini-pro': { input: 0.00000050, output: 0.00000150 },

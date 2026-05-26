@@ -33,7 +33,7 @@ function ChatWindow({
     if (nextProvider === 'openai') {
       setModel('gpt-3.5-turbo');
     } else if (nextProvider === 'gemini') {
-      setModel('gemini-2.0-flash');
+      setModel('gemini-3.1-flash-lite');
     } else {
       setModel('mock-model');
     }
@@ -202,6 +202,7 @@ function ChatWindow({
           )}
           {provider === 'gemini' && (
             <>
+              <option value="gemini-3.1-flash-lite">Model: Gemini-3.1-flash-lite (Free - 500 RPD)</option>
               <option value="gemini-1.5-flash">Model: Gemini-1.5-flash (Free - 15 RPM)</option>
               <option value="gemini-2.0-flash">Model: Gemini-2.0-flash (Free - 10 RPM)</option>
               <option value="gemini-2.5-pro">Model: Gemini-2.5-pro (Free - 2 RPM)</option>
