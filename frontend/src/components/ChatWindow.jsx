@@ -33,7 +33,7 @@ function ChatWindow({
     if (nextProvider === 'openai') {
       setModel('gpt-3.5-turbo');
     } else if (nextProvider === 'gemini') {
-      setModel('gemini-1.5-flash');
+      setModel('gemini-2.0-flash');
     } else {
       setModel('mock-model');
     }
